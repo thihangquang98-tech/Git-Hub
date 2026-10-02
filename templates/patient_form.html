@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% if mode == "add" %}
+            Thêm bệnh nhân
+        {% else %}
+            Sửa bệnh nhân
+        {% endif %}
+        - Dental Clinic
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 30px auto;
+            padding: 20px;
+        }
+
+        .form-box {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button,
+        a {
+            padding: 11px 18px;
+            border-radius: 8px;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="header">
+
+    <h1>🦷 Dental Clinic</h1>
+
+    <p>
+        {% if mode == "add" %}
+            Thêm bệnh nhân
+        {% else %}
+            Chỉnh sửa bệnh nhân
+        {% endif %}
+    </p>
+
+</div>
+
+
+<div class="container">
+
+    <div class="form-box">
+
+        <h2>
+            {% if mode == "add" %}
+                ➕ Thêm bệnh nhân
+            {% else %}
+                ✏️ Chỉnh sửa bệnh nhân
+            {% endif %}
+        </h2>
+
+
+        {% if error %}
+
+            <div class="error">
+                {{ error }}
+            </div>
+
+        {% endif %}
+
+
+        <form method="POST">
+
+            <!-- Mã bệnh nhân -->
+
+            <div class="form-group">
+
+                <label>
+                    Mã bệnh nhân *
+                </label>
+
+                <input
+                    type="text"
+                    name="patient_code"
+                    required
+                    value="{{ patient[1] if patient else '' }}"
+                    placeholder="Ví dụ: BN004"
+                >
+
+            </div>
+
+
+            <!-- Họ tên -->
+
+            <div class="form-group">
+
+                <label>
+                    Họ và tên *
+                </label>
+
+                <input
+                    type="text"
+                    name="full_name"
+                    required
+                    value="{{ patient[2] if patient else '' }}"
+                    placeholder="Nhập họ và tên"
+                >
+
+            </div>
+
+
+            <!-- Ngày sinh -->
+
+            <div class="form-group">
+
+                <label>
+                    Ngày sinh
+                </label>
+
+                <input
+                    type="date"
+                    name="date_of_birth"
+                    value="{{ patient[3] if patient and patient[3] else '' }}"
+                >
+
+            </div>
+
+
+            <!-- Giới tính -->
+
+            <div class="form-group">
+
+                <label>
+                    Giới tính
+                </label>
+
+                <select name="gender">
+
+                    <option value="">
+                        -- Chọn giới tính --
+                    </option>
+
+                    <option
+                        value="Nam"
+                        {% if patient and patient[4] == 'Nam' %}selected{% endif %}
+                    >
+                        Nam
+                    </option>
+
+                    <option
+                        value="Nữ"
+                        {% if patient and patient[4] == 'Nữ' %}selected{% endif %}
+                    >
+                        Nữ
+                    </option>
+
+                    <option
+                        value="Khác"
+                        {% if patient and patient[4] == 'Khác' %}selected{% endif %}
+                    >
+                        Khác
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- Số điện thoại -->
+
+            <div class="form-group">
+
+                <label>
+                    Số điện thoại
+                </label>
+
+                <input
+                    type="text"
+                    name="phone"
+                    value="{{ patient[5] if patient else '' }}"
+                    placeholder="Nhập số điện thoại"
+                >
+
+            </div>
+
+
+            <!-- Email -->
+
+            <div class="form-group">
+
+                <label>
+                    Email
+                </label>
+
+                <input
+                    type="email"
+                    name="email"
+                    value="{{ patient[6] if patient else '' }}"
+                    placeholder="example@gmail.com"
+                >
+
+            </div>
+
+
+            <!-- Địa chỉ -->
+
+            <div class="form-group">
+
+                <label>
+                    Địa chỉ
+                </label>
+
+                <textarea
+                    name="address"
+                    placeholder="Nhập địa chỉ"
+                >{{ patient[7] if patient else '' }}</textarea>
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="btn-primary"
+                >
+                    💾 Lưu
+                </button>
+
+                <a
+                    href="/patients"
+                    class="btn-secondary"
+                >
+                    Hủy
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

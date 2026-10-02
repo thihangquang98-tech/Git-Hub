@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quản lý bệnh nhân - Dental Clinic</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #1f2937;
+        }
+
+        .header {
+            background: #2563eb;
+            color: white;
+            padding: 20px 40px;
+        }
+
+        .header h1 {
+            margin: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .top-bar h2 {
+            margin: 0;
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #64748b;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #f59e0b;
+            color: white;
+        }
+
+        .btn-delete {
+            background: #dc2626;
+            color: white;
+        }
+
+        .search-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        .search-box form {
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-box input {
+            flex: 1;
+            padding: 11px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            font-size: 15px;
+        }
+
+        .table-box {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th,
+        td {
+            padding: 13px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+        }
+
+        th {
+            background: #f8fafc;
+        }
+
+        .actions {
+            display: flex;
+            gap: 6px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+    </style>
+
+</head>
+
+<body>
+
+<div class="header">
+
+    <h1>🦷 Dental Clinic</h1>
+
+    <p>Quản lý bệnh nhân</p>
+
+</div>
+
+
+<div class="container">
+
+    <div class="top-bar">
+
+        <h2>👥 Danh sách bệnh nhân</h2>
+
+        <a href="/patients/add" class="btn btn-primary">
+            + Thêm bệnh nhân
+        </a>
+
+    </div>
+
+
+    <!-- TÌM KIẾM -->
+
+    <div class="search-box">
+
+        <form method="GET" action="/patients">
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Tìm theo mã bệnh nhân, họ tên hoặc số điện thoại..."
+                value="{{ search }}"
+            >
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                🔍 Tìm kiếm
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- DANH SÁCH -->
+
+    <div class="table-box">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Mã BN</th>
+
+                    <th>Họ và tên</th>
+
+                    <th>Ngày sinh</th>
+
+                    <th>Giới tính</th>
+
+                    <th>Số điện thoại</th>
+
+                    <th>Email</th>
+
+                    <th>Thao tác</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+            {% for patient in patients %}
+
+                <tr>
+
+                    <td>{{ patient[1] }}</td>
+
+                    <td>{{ patient[2] }}</td>
+
+                    <td>{{ patient[3] or '' }}</td>
+
+                    <td>{{ patient[4] or '' }}</td>
+
+                    <td>{{ patient[5] or '' }}</td>
+
+                    <td>{{ patient[6] or '' }}</td>
+
+                    <td>
+
+                        <div class="actions">
+
+                            <a
+                                href="/patients/edit/{{ patient[0] }}"
+                                class="btn btn-edit"
+                            >
+                                ✏️
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="/patients/delete/{{ patient[0] }}"
+                                onsubmit="return confirm('Bạn có chắc muốn xóa bệnh nhân này?');"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-delete"
+                                >
+                                    🗑️
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            {% else %}
+
+                <tr>
+
+                    <td colspan="7" class="empty">
+                        Không tìm thấy bệnh nhân.
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <br>
+
+    <a href="/" class="btn btn-secondary">
+        ← Về Dashboard
+    </a>
+
+</div>
+
+</body>
+
+</html>

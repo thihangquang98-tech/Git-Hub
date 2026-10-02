@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Đăng nhập - Phòng khám nha khoa</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+
+            min-height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            font-family: Arial, sans-serif;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #e8f3ff,
+                    #f7fbff
+                );
+        }
+
+
+        .login-box {
+            width: 420px;
+
+            max-width: 90%;
+
+            background: white;
+
+            padding: 40px;
+
+            border-radius: 22px;
+
+            box-shadow:
+                0 12px 35px
+                rgba(0,0,0,0.12);
+        }
+
+
+        .logo {
+            text-align: center;
+
+            font-size: 58px;
+
+            margin-bottom: 5px;
+        }
+
+
+        h1 {
+            text-align: center;
+
+            color: #24547d;
+
+            margin: 0;
+        }
+
+
+        .subtitle {
+            text-align: center;
+
+            color: #777;
+
+            margin: 10px 0 30px;
+        }
+
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+
+        label {
+            display: block;
+
+            font-weight: bold;
+
+            margin-bottom: 8px;
+
+            color: #333;
+        }
+
+
+        .password-wrapper {
+            position: relative;
+        }
+
+
+        input {
+            width: 100%;
+
+            padding: 14px 48px 14px 14px;
+
+            border:
+                1px solid #ccc;
+
+            border-radius: 10px;
+
+            font-size: 16px;
+        }
+
+
+        input:focus {
+            outline: none;
+
+            border-color: #2875e8;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(40,117,232,0.10);
+        }
+
+
+        /* NÚT MẮT */
+
+        .toggle-password {
+            position: absolute;
+
+            right: 12px;
+
+            top: 50%;
+
+            transform:
+                translateY(-50%);
+
+            border: none;
+
+            background: transparent;
+
+            padding: 5px;
+
+            cursor: pointer;
+
+            font-size: 20px;
+
+            color: #666;
+
+            width: auto;
+        }
+
+
+        .toggle-password:hover {
+            color: #2875e8;
+        }
+
+
+        button.login-button {
+            width: 100%;
+
+            border: none;
+
+            padding: 14px;
+
+            background: #2875e8;
+
+            color: white;
+
+            border-radius: 10px;
+
+            font-size: 17px;
+
+            cursor: pointer;
+
+            margin-top: 5px;
+        }
+
+
+        button.login-button:hover {
+            background: #1f62c5;
+        }
+
+
+        .error {
+            background: #f8d7da;
+
+            color: #842029;
+
+            padding: 12px;
+
+            border-radius: 9px;
+
+            margin-bottom: 20px;
+
+            text-align: center;
+        }
+
+
+        .info {
+            margin-top: 25px;
+
+            background: #eef7ff;
+
+            padding: 15px;
+
+            border-radius: 10px;
+
+            color: #555;
+
+            font-size: 14px;
+
+            line-height: 1.5;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="login-box">
+
+
+    <div class="logo">
+        🦷
+    </div>
+
+
+    <h1>
+        Phòng khám nha khoa
+    </h1>
+
+
+    <p class="subtitle">
+        Hệ thống quản lý phòng khám
+    </p>
+
+
+    {% if error %}
+
+        <div class="error">
+
+            ⚠️ {{ error }}
+
+        </div>
+
+    {% endif %}
+
+
+    <form method="POST">
+
+
+        <!-- USERNAME -->
+
+        <div class="form-group">
+
+            <label>
+                Tên đăng nhập
+            </label>
+
+            <input
+                type="text"
+                name="username"
+                placeholder="Nhập tên đăng nhập"
+                required
+                autofocus
+            >
+
+        </div>
+
+
+        <!-- PASSWORD -->
+
+        <div class="form-group">
+
+            <label>
+                Mật khẩu
+            </label>
+
+
+            <div class="password-wrapper">
+
+                <input
+                    type="password"
+                    id="password"
+                    name="password"
+                    placeholder="Nhập mật khẩu"
+                    required
+                >
+
+
+                <button
+                    type="button"
+                    class="toggle-password"
+                    id="togglePassword"
+                    title="Hiện/ẩn mật khẩu"
+                    aria-label="Hiện hoặc ẩn mật khẩu"
+                >
+                    👁️
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <!-- LOGIN -->
+
+        <button
+            type="submit"
+            class="login-button"
+        >
+            🔐 Đăng nhập
+        </button>
+
+
+    </form>
+
+
+    <div class="info">
+
+        <strong>
+            Phân quyền hệ thống
+        </strong>
+
+        <br><br>
+
+        👩‍💼
+        <strong>Lễ tân:</strong>
+        Bệnh nhân, lịch hẹn, dịch vụ, hóa đơn.
+
+        <br><br>
+
+        👨‍⚕️
+        <strong>Bác sĩ:</strong>
+        Lịch khám và hồ sơ khám.
+
+        <br><br>
+
+        👨‍💼
+        <strong>Quản lý:</strong>
+        Toàn bộ hệ thống.
+
+    </div>
+
+
+</div>
+
+
+<script>
+
+    const passwordInput =
+        document.getElementById("password");
+
+    const togglePassword =
+        document.getElementById("togglePassword");
+
+
+    togglePassword.addEventListener(
+        "click",
+        function () {
+
+            if (
+                passwordInput.type === "password"
+            ) {
+
+                passwordInput.type = "text";
+
+                togglePassword.textContent = "🙈";
+
+                togglePassword.title =
+                    "Ẩn mật khẩu";
+
+            } else {
+
+                passwordInput.type = "password";
+
+                togglePassword.textContent = "👁️";
+
+                togglePassword.title =
+                    "Hiện mật khẩu";
+
+            }
+
+        }
+    );
+
+</script>
+
+
+</body>
+
+</html>

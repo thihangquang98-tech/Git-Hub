@@ -1,0 +1,133 @@
+services:
+
+  # =========================================================
+  # FLASK WEB APPLICATION
+  # =========================================================
+  web:
+    build: .
+    container_name: dental-web
+    restart: unless-stopped
+
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_NAME: dental_clinic
+      DB_USER: clinic_user
+      DB_PASSWORD: clinic_password
+      SECRET_KEY: dental-clinic-production-secret-key
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    ports:
+      - "5000:5000"
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - clinic_network
+
+
+  # =========================================================
+  # POSTGRESQL DATABASE
+  # =========================================================
+  db:
+    image: postgres:16
+    container_name: dental-postgres
+    restart: unless-stopped
+
+    environment:
+      POSTGRES_DB: dental_clinic
+      POSTGRES_USER: clinic_user
+      POSTGRES_PASSWORD: clinic_password
+
+    ports:
+      - "5433:5432"
+
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "pg_isready -U clinic_user -d dental_clinic"
+        ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - clinic_network
+
+
+  # =========================================================
+  # PGADMIN
+  # =========================================================
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: dental-pgadmin
+    restart: unless-stopped
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@gmail.com
+      PGADMIN_DEFAULT_PASSWORD: Admin@123
+
+    ports:
+      - "5051:8080"
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - clinic_network
+
+
+  # =========================================================
+  # POSTGRESQL EXPORTER
+  # Dùng riêng cho Dental Clinic
+  # =========================================================
+  dental-postgres-exporter:
+    image: prometheuscommunity/postgres-exporter:v0.15.0
+    container_name: dental-postgres-exporter
+    restart: unless-stopped
+
+    environment:
+      DATA_SOURCE_NAME: "postgresql://clinic_user:clinic_password@dental-postgres:5432/dental_clinic?sslmode=disable"
+
+    depends_on:
+      db:
+        condition: service_healthy
+
+    security_opt:
+      - no-new-privileges:true
+
+    networks:
+      - clinic_network
+
+
+# =========================================================
+# VOLUMES
+# =========================================================
+volumes:
+
+  postgres_data:
+
+
+# =========================================================
+# NETWORK
+# =========================================================
+networks:
+
+  clinic_network:
+    driver: bridge

@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Dashboard - Phòng khám nha khoa</title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: #f3f6fa;
+            color: #1f2937;
+        }
+
+        /* =========================================
+           LAYOUT
+        ========================================= */
+
+        .layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+
+        /* =========================================
+           SIDEBAR
+        ========================================= */
+
+        .sidebar {
+            width: 325px;
+            background: linear-gradient(
+                180deg,
+                #174f78 0%,
+                #104466 100%
+            );
+
+            color: white;
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+
+            overflow-y: auto;
+            z-index: 1000;
+        }
+
+
+        /* LOGO */
+
+        .logo-area {
+            padding: 48px 20px 30px;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 55px;
+            margin-bottom: 12px;
+        }
+
+        .clinic-name {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .clinic-subtitle {
+            font-size: 16px;
+            color: #dbeafe;
+        }
+
+
+        /* DIVIDER */
+
+        .sidebar-divider {
+            height: 1px;
+            background: rgba(255,255,255,0.18);
+            margin: 0 20px 25px;
+        }
+
+
+        /* MENU GROUP */
+
+        .menu-title {
+            padding: 0 31px;
+            margin-top: 25px;
+            margin-bottom: 12px;
+
+            color: #9ed3ff;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+
+        /* MENU ITEM */
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+
+            margin: 5px 19px;
+            padding: 16px 20px;
+
+            border-radius: 12px;
+
+            color: white;
+            text-decoration: none;
+
+            font-size: 18px;
+
+            transition: all 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background: rgba(255,255,255,0.13);
+            transform: translateX(2px);
+        }
+
+        .menu-item.active {
+            background: rgba(255,255,255,0.20);
+        }
+
+        .menu-icon {
+            width: 38px;
+            font-size: 22px;
+            text-align: center;
+            margin-right: 6px;
+        }
+
+
+        /* LOGOUT */
+
+        .logout-item {
+            margin-top: 8px;
+        }
+
+
+        /* =========================================
+           MAIN
+        ========================================= */
+
+        .main {
+            margin-left: 325px;
+            width: calc(100% - 325px);
+            min-height: 100vh;
+        }
+
+
+        /* =========================================
+           TOP HEADER
+        ========================================= */
+
+        .topbar {
+            height: 92px;
+
+            background: white;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            padding: 0 38px;
+        }
+
+        .page-title {
+            margin: 0;
+
+            font-size: 31px;
+            color: #124e7d;
+        }
+
+        .page-subtitle {
+            margin-top: 5px;
+
+            color: #7a7a7a;
+            font-size: 16px;
+        }
+
+
+        /* USER */
+
+        .user-info {
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        .user-name {
+            font-weight: bold;
+            font-size: 18px;
+            color: #222;
+        }
+
+        .user-role {
+            margin-top: 4px;
+            color: #777;
+            font-size: 14px;
+        }
+
+
+        /* =========================================
+           CONTENT
+        ========================================= */
+
+        .content {
+            padding: 20px 38px 40px;
+        }
+
+
+        /* =========================================
+           WELCOME
+        ========================================= */
+
+        .welcome {
+            background: linear-gradient(
+                135deg,
+                #2473a8,
+                #1c5c88
+            );
+
+            color: white;
+
+            padding: 32px 38px;
+
+            border-radius: 20px;
+
+            margin-bottom: 30px;
+
+            box-shadow: 0 8px 20px rgba(31, 78, 121, 0.15);
+        }
+
+        .welcome h2 {
+            margin: 0 0 8px;
+
+            font-size: 30px;
+        }
+
+        .welcome p {
+            margin: 0;
+
+            font-size: 18px;
+            color: #eaf6ff;
+        }
+
+
+        /* =========================================
+           STATISTICS
+        ========================================= */
+
+        .stats-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(4, minmax(0, 1fr));
+
+            gap: 22px;
+
+            margin-bottom: 32px;
+        }
+
+
+        .stat-card {
+            background: white;
+
+            border-radius: 18px;
+
+            padding: 28px 25px;
+
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+
+            min-height: 135px;
+        }
+
+
+        .stat-info {
+            min-width: 0;
+        }
+
+        .stat-title {
+            color: #777;
+            font-size: 16px;
+
+            margin-bottom: 18px;
+        }
+
+        .stat-number {
+            color: #145681;
+
+            font-size: 36px;
+            font-weight: bold;
+        }
+
+
+        .stat-icon {
+            width: 58px;
+            height: 58px;
+
+            border-radius: 15px;
+
+            background: #edf6fd;
+
+            display: flex;
+            align-items: center;
+            justify-content: center;
+
+            font-size: 29px;
+
+            flex-shrink: 0;
+        }
+
+
+        /* =========================================
+           RECENT APPOINTMENTS
+        ========================================= */
+
+        .panel {
+            background: white;
+
+            border-radius: 18px;
+
+            box-shadow: 0 5px 15px rgba(0,0,0,0.06);
+
+            overflow: hidden;
+        }
+
+
+        .panel-header {
+            padding: 26px 30px;
+
+            border-bottom: 1px solid #e5e7eb;
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .panel-header h2 {
+            margin: 0;
+
+            color: #124e7d;
+
+            font-size: 23px;
+        }
+
+
+        .panel-icon {
+            font-size: 24px;
+        }
+
+
+        /* TABLE */
+
+        .table-wrapper {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f5f7f9;
+
+            color: #526273;
+
+            padding: 17px 20px;
+
+            text-align: left;
+
+            font-size: 14px;
+
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 19px 20px;
+
+            border-bottom: 1px solid #edf0f3;
+
+            font-size: 16px;
+        }
+
+        tbody tr:hover {
+            background: #f8fbfd;
+        }
+
+
+        .patient-code {
+            font-weight: bold;
+            color: #222;
+        }
+
+
+        .appointment-time {
+            white-space: nowrap;
+        }
+
+
+        /* =========================================
+           EMPTY
+        ========================================= */
+
+        .empty {
+            padding: 55px 20px;
+
+            text-align: center;
+
+            color: #777;
+        }
+
+        .empty-icon {
+            font-size: 45px;
+            margin-bottom: 12px;
+        }
+
+        .empty h3 {
+            margin: 0 0 8px;
+            color: #555;
+        }
+
+
+        /* =========================================
+           QUICK LINKS
+        ========================================= */
+
+        .quick-section {
+            margin-top: 30px;
+        }
+
+        .quick-grid {
+            display: grid;
+
+            grid-template-columns:
+                repeat(3, minmax(0, 1fr));
+
+            gap: 20px;
+        }
+
+        .quick-card {
+            background: white;
+
+            border-radius: 16px;
+
+            padding: 22px;
+
+            text-decoration: none;
+
+            color: #1f2937;
+
+            box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+
+            transition: 0.2s;
+        }
+
+        .quick-card:hover {
+            transform: translateY(-2px);
+
+            box-shadow: 0 8px 20px rgba(0,0,0,0.09);
+        }
+
+        .quick-icon {
+            font-size: 30px;
+            margin-bottom: 10px;
+        }
+
+        .quick-title {
+            font-size: 18px;
+            font-weight: bold;
+
+            color: #145681;
+
+            margin-bottom: 5px;
+        }
+
+        .quick-description {
+            font-size: 14px;
+            color: #777;
+        }
+
+
+        /* =========================================
+           RESPONSIVE
+        ========================================= */
+
+        @media (max-width: 1200px) {
+
+            .stats-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+            .quick-grid {
+                grid-template-columns:
+                    repeat(2, minmax(0, 1fr));
+            }
+
+        }
+
+
+        @media (max-width: 850px) {
+
+            .sidebar {
+                width: 230px;
+            }
+
+            .main {
+                margin-left: 230px;
+                width: calc(100% - 230px);
+            }
+
+            .clinic-name {
+                font-size: 19px;
+            }
+
+            .menu-item {
+                font-size: 15px;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            .topbar {
+                padding: 0 20px;
+            }
+
+        }
+
+
+        @media (max-width: 650px) {
+
+            .sidebar {
+                position: relative;
+                width: 100%;
+                min-height: auto;
+            }
+
+            .main {
+                margin-left: 0;
+                width: 100%;
+            }
+
+            .layout {
+                display: block;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .quick-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .topbar {
+                height: auto;
+                padding: 20px;
+
+                align-items: flex-start;
+
+                gap: 15px;
+            }
+
+            .user-info {
+                display: none;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="layout">
+
+
+    <!-- =====================================================
+         SIDEBAR
+    ====================================================== -->
+
+    <aside class="sidebar">
+
+
+        <!-- LOGO -->
+
+        <div class="logo-area">
+
+            <div class="logo">
+                🦷
+            </div>
+
+            <div class="clinic-name">
+                Phòng khám nha khoa
+            </div>
+
+            <div class="clinic-subtitle">
+                Dental Clinic Management
+            </div>
+
+        </div>
+
+
+        <div class="sidebar-divider"></div>
+
+
+        <!-- =================================================
+             TỔNG QUAN
+        ================================================== -->
+
+        <div class="menu-title">
+            Tổng quan
+        </div>
+
+
+        <a
+            href="{{ url_for('index') }}"
+            class="menu-item active"
+        >
+
+            <span class="menu-icon">
+                🏠
+            </span>
+
+            <span>
+                Trang chủ
+            </span>
+
+        </a>
+
+
+        <!-- =================================================
+             QUẢN LÝ PHÒNG KHÁM
+        ================================================== -->
+
+        <div class="menu-title">
+            Quản lý phòng khám
+        </div>
+
+
+        <!-- BỆNH NHÂN -->
+
+        <a
+            href="{{ url_for('patients') }}"
+            class="menu-item"
+        >
+
+            <span class="menu-icon">
+                👤
+            </span>
+
+            <span>
+                Bệnh nhân
+            </span>
+
+        </a>
+
+
+        <!-- BÁC SĨ -->
+
+        <a
+            href="{{ url_for('doctors') }}"
+            class="menu-item"
+        >
+
+            <span class="menu-icon">
+                👨‍⚕️
+            </span>
+
+            <span>
+                Bác sĩ
+            </span>
+
+        </a>
+
+
+        <!-- LỊCH HẸN -->
+
+        <a
+            href="{{ url_for('appointments') }}"
+            class="menu-item"
+        >
+
+            <span class="menu-icon">
+                📅
+            </span>
+
+            <span>
+                Lịch hẹn
+            </span>
+
+        </a>
+
+
+        <!-- HỒ SƠ KHÁM -->
+
+        <a
+            href="{{ url_for('medical_records') }}"
+            class="menu-item"
+        >
+
+            <span class="menu-icon">
+                📋
+            </span>
+
+            <span>
+                Hồ sơ khám
+            </span>
+
+        </a>
+
+
+        <!-- DỊCH VỤ -->
+
+        <a
+            href="{{ url_for('services') }}"
+            class="menu-item"
+        >
+
+            <span class="menu-icon">
+                🦷
+            </span>
+
+            <span>
+                Dịch vụ
+            </span>
+
+        </a>
+
+
+        <!-- HÓA ĐƠN -->
+
+        <a
+            href="{{ url_for('invoices') }}"
+            class="menu-item"
+        >
+
+            <span class="menu-icon">
+                💰
+            </span>
+
+            <span>
+                Hóa đơn
+            </span>
+
+        </a>
+
+
+        <!-- =================================================
+             TÀI KHOẢN
+        ================================================== -->
+
+        <div class="menu-title">
+            Tài khoản
+        </div>
+
+
+        <!-- USER INFO -->
+
+        <div
+            class="menu-item"
+            style="cursor: default;"
+        >
+
+            <span class="menu-icon">
+                👨‍💼
+            </span>
+
+            <span>
+                {{ session.get('full_name', session.get('username', 'Người dùng')) }}
+            </span>
+
+        </div>
+
+
+        <!-- LOGOUT -->
+
+        <a
+            href="{{ url_for('logout') }}"
+            class="menu-item logout-item"
+        >
+
+            <span class="menu-icon">
+                🚪
+            </span>
+
+            <span>
+                Đăng xuất
+            </span>
+
+        </a>
+
+
+    </aside>
+
+
+
+    <!-- =====================================================
+         MAIN CONTENT
+    ====================================================== -->
+
+    <main class="main">
+
+
+        <!-- =================================================
+             TOP BAR
+        ================================================== -->
+
+        <header class="topbar">
+
+            <div>
+
+                <h1 class="page-title">
+                    Dashboard
+                </h1>
+
+                <div class="page-subtitle">
+                    Tổng quan hoạt động phòng khám
+                </div>
+
+            </div>
+
+
+            <div class="user-info">
+
+                <div class="user-name">
+
+                    {{ session.get(
+                        'full_name',
+                        session.get('username', 'Người dùng')
+                    ) }}
+
+                </div>
+
+                <div class="user-role">
+
+                    {% if session.get('role') == 'manager' %}
+
+                        Quản lý
+
+                    {% elif session.get('role') == 'doctor' %}
+
+                        Bác sĩ
+
+                    {% elif session.get('role') == 'receptionist' %}
+
+                        Nhân viên lễ tân
+
+                    {% else %}
+
+                        Người dùng
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+        </header>
+
+
+
+        <!-- =================================================
+             CONTENT
+        ================================================== -->
+
+        <section class="content">
+
+
+            <!-- =================================================
+                 WELCOME
+            ================================================== -->
+
+            <div class="welcome">
+
+                <h2>
+
+                    Xin chào,
+
+                    {{ session.get(
+                        'full_name',
+                        session.get('username', 'bạn')
+                    ) }}! 👋
+
+                </h2>
+
+                <p>
+                    Chào mừng bạn đến với hệ thống quản lý
+                    phòng khám nha khoa.
+                </p>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 STATISTICS
+            ================================================== -->
+
+            <div class="stats-grid">
+
+
+                <!-- BỆNH NHÂN -->
+
+                <div class="stat-card">
+
+                    <div class="stat-info">
+
+                        <div class="stat-title">
+                            Tổng bệnh nhân
+                        </div>
+
+                        <div class="stat-number">
+
+                            {% if total_patients is defined %}
+
+                                {{ total_patients }}
+
+                            {% elif patients is defined %}
+
+                                {{ patients|length }}
+
+                            {% else %}
+
+                                0
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-icon">
+                        👤
+                    </div>
+
+                </div>
+
+
+
+                <!-- BÁC SĨ -->
+
+                <div class="stat-card">
+
+                    <div class="stat-info">
+
+                        <div class="stat-title">
+                            Bác sĩ
+                        </div>
+
+                        <div class="stat-number">
+
+                            {% if total_doctors is defined %}
+
+                                {{ total_doctors }}
+
+                            {% elif doctors is defined %}
+
+                                {{ doctors|length }}
+
+                            {% else %}
+
+                                0
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-icon">
+                        👨‍⚕️
+                    </div>
+
+                </div>
+
+
+
+                <!-- LỊCH HẸN -->
+
+                <div class="stat-card">
+
+                    <div class="stat-info">
+
+                        <div class="stat-title">
+                            Lịch hẹn
+                        </div>
+
+                        <div class="stat-number">
+
+                            {% if total_appointments is defined %}
+
+                                {{ total_appointments }}
+
+                            {% elif appointments is defined %}
+
+                                {{ appointments|length }}
+
+                            {% else %}
+
+                                0
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-icon">
+                        📅
+                    </div>
+
+                </div>
+
+
+
+                <!-- DỊCH VỤ -->
+
+                <div class="stat-card">
+
+                    <div class="stat-info">
+
+                        <div class="stat-title">
+                            Dịch vụ
+                        </div>
+
+                        <div class="stat-number">
+
+                            {% if total_services is defined %}
+
+                                {{ total_services }}
+
+                            {% elif services is defined %}
+
+                                {{ services|length }}
+
+                            {% else %}
+
+                                0
+
+                            {% endif %}
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat-icon">
+                        🦷
+                    </div>
+
+                </div>
+
+
+            </div>
+
+
+
+            <!-- =================================================
+                 RECENT APPOINTMENTS
+            ================================================== -->
+
+            <div class="panel">
+
+
+                <div class="panel-header">
+
+                    <span class="panel-icon">
+                        📅
+                    </span>
+
+                    <h2>
+                        Lịch hẹn gần đây
+                    </h2>
+
+                </div>
+
+
+
+                <div class="table-wrapper">
+
+                    {% set dashboard_appointments =
+                        recent_appointments
+                        if recent_appointments is defined
+                        else (
+                            appointments
+                            if appointments is defined
+                            else []
+                        )
+                    %}
+
+
+                    {% if dashboard_appointments %}
+
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>
+                                    MÃ BN
+                                </th>
+
+                                <th>
+                                    BỆNH NHÂN
+                                </th>
+
+                                <th>
+                                    BÁC SĨ
+                                </th>
+
+                                <th>
+                                    THỜI GIAN
+                                </th>
+
+                                <th>
+                                    LÝ DO
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+
+                        <tbody>
+
+
+                        {% for appointment in dashboard_appointments[:5] %}
+
+
+                            <tr>
+
+
+                                <!-- MÃ BỆNH NHÂN -->
+
+                                <td>
+
+                                    <span class="patient-code">
+
+                                        {% if appointment|length > 5 %}
+
+                                            {{ appointment[5] }}
+
+                                        {% else %}
+
+                                            —
+
+                                        {% endif %}
+
+                                    </span>
+
+                                </td>
+
+
+                                <!-- BỆNH NHÂN -->
+
+                                <td>
+
+                                    {% if appointment|length > 6 %}
+
+                                        {{ appointment[6] }}
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- BÁC SĨ -->
+
+                                <td>
+
+                                    {% if appointment|length > 8 %}
+
+                                        {{ appointment[8] }}
+
+                                    {% elif appointment|length > 7 %}
+
+                                        {{ appointment[7] }}
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- THỜI GIAN -->
+
+                                <td class="appointment-time">
+
+                                    {% if appointment[1] is defined %}
+
+                                        {{ appointment[1].strftime('%d/%m/%Y %H:%M') }}
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                                <!-- LÝ DO -->
+
+                                <td>
+
+                                    {% if appointment|length > 3
+                                          and appointment[3] %}
+
+                                        {{ appointment[3] }}
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+
+                            </tr>
+
+
+                        {% endfor %}
+
+
+                        </tbody>
+
+                    </table>
+
+
+                    {% else %}
+
+
+                    <div class="empty">
+
+                        <div class="empty-icon">
+                            📅
+                        </div>
+
+                        <h3>
+                            Chưa có lịch hẹn
+                        </h3>
+
+                        <p>
+                            Hiện tại chưa có lịch hẹn nào trong hệ thống.
+                        </p>
+
+                    </div>
+
+
+                    {% endif %}
+
+                </div>
+
+            </div>
+
+
+
+            <!-- =================================================
+                 QUICK ACCESS
+            ================================================== -->
+
+            <div class="quick-section">
+
+                <div class="panel-header"
+                     style="
+                        background: transparent;
+                        border: none;
+                        padding-left: 0;
+                     ">
+
+                    <span class="panel-icon">
+                        ⚡
+                    </span>
+
+                    <h2>
+                        Truy cập nhanh
+                    </h2>
+
+                </div>
+
+
+                <div class="quick-grid">
+
+
+                    <!-- BỆNH NHÂN -->
+
+                    <a
+                        href="{{ url_for('patients') }}"
+                        class="quick-card"
+                    >
+
+                        <div class="quick-icon">
+                            👤
+                        </div>
+
+                        <div class="quick-title">
+                            Quản lý bệnh nhân
+                        </div>
+
+                        <div class="quick-description">
+                            Xem, thêm, sửa và quản lý thông tin bệnh nhân.
+                        </div>
+
+                    </a>
+
+
+
+                    <!-- LỊCH HẸN -->
+
+                    <a
+                        href="{{ url_for('appointments') }}"
+                        class="quick-card"
+                    >
+
+                        <div class="quick-icon">
+                            📅
+                        </div>
+
+                        <div class="quick-title">
+                            Quản lý lịch hẹn
+                        </div>
+
+                        <div class="quick-description">
+                            Theo dõi và quản lý lịch khám của bệnh nhân.
+                        </div>
+
+                    </a>
+
+
+
+                    <!-- HÓA ĐƠN -->
+
+                    <a
+                        href="{{ url_for('invoices') }}"
+                        class="quick-card"
+                    >
+
+                        <div class="quick-icon">
+                            💰
+                        </div>
+
+                        <div class="quick-title">
+                            Quản lý hóa đơn
+                        </div>
+
+                        <div class="quick-description">
+                            Quản lý chi phí, trạng thái thanh toán và hóa đơn.
+                        </div>
+
+                    </a>
+
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Quản lý bác sĩ</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+
+            margin: 0;
+
+            background: #f4f7fb;
+
+            color: #333;
+        }
+
+
+        .container {
+            width: 92%;
+
+            max-width: 1200px;
+
+            margin: 30px auto;
+        }
+
+
+        /* ============================
+           HEADER
+        ============================ */
+
+        .header {
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0,0,0,0.08);
+        }
+
+
+        .header h1 {
+            margin: 0 0 8px 0;
+
+            color: #1f4e79;
+        }
+
+
+        .header p {
+            margin: 0;
+
+            color: #666;
+        }
+
+
+        /* ============================
+           TOOLBAR
+        ============================ */
+
+        .toolbar {
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0,0,0,0.08);
+        }
+
+
+        .search-form {
+            display: flex;
+
+            gap: 10px;
+
+            flex: 1;
+
+            max-width: 600px;
+        }
+
+
+        .search-form input {
+            flex: 1;
+
+            padding: 11px 14px;
+
+            border:
+                1px solid #ccc;
+
+            border-radius: 7px;
+
+            font-size: 14px;
+        }
+
+
+        .search-form input:focus {
+            outline: none;
+
+            border-color: #1f6feb;
+
+            box-shadow:
+                0 0 0 3px
+                rgba(31,111,235,0.1);
+        }
+
+
+        /* ============================
+           BUTTON
+        ============================ */
+
+        button,
+        .btn {
+            border: none;
+
+            border-radius: 7px;
+
+            padding: 10px 16px;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            display: inline-block;
+        }
+
+
+        .btn-search {
+            background: #1f6feb;
+
+            color: white;
+        }
+
+
+        .btn-search:hover {
+            background: #1558bd;
+        }
+
+
+        .btn-add {
+            background: #198754;
+
+            color: white;
+        }
+
+
+        .btn-add:hover {
+            background: #146c43;
+        }
+
+
+        .btn-edit {
+            background: #ffc107;
+
+            color: #212529;
+        }
+
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+
+
+        .btn-delete {
+            background: #dc3545;
+
+            color: white;
+        }
+
+
+        .btn-delete:hover {
+            background: #bb2d3b;
+        }
+
+
+        .btn-home {
+            background: #6c757d;
+
+            color: white;
+        }
+
+
+        .btn-home:hover {
+            background: #565e64;
+        }
+
+
+        /* ============================
+           TABLE
+        ============================ */
+
+        .table-container {
+            background: white;
+
+            border-radius: 12px;
+
+            overflow-x: auto;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0,0,0,0.08);
+        }
+
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 850px;
+        }
+
+
+        th {
+            background: #1f4e79;
+
+            color: white;
+
+            padding: 14px 10px;
+
+            text-align: left;
+        }
+
+
+        td {
+            padding: 13px 10px;
+
+            border-bottom:
+                1px solid #eee;
+        }
+
+
+        tr:hover {
+            background: #f8fbff;
+        }
+
+
+        /* ============================
+           ACTIONS
+        ============================ */
+
+        .actions {
+            display: flex;
+
+            gap: 7px;
+
+            align-items: center;
+        }
+
+
+        .actions form {
+            margin: 0;
+        }
+
+
+        /* ============================
+           EMPTY
+        ============================ */
+
+        .empty {
+            text-align: center;
+
+            padding: 30px;
+
+            color: #777;
+        }
+
+
+        .result-info {
+            margin-bottom: 15px;
+
+            color: #666;
+        }
+
+
+        /* ============================
+           RESPONSIVE
+        ============================ */
+
+        @media (max-width: 800px) {
+
+            .container {
+                width: 96%;
+
+                margin: 15px auto;
+            }
+
+
+            .toolbar {
+                align-items: stretch;
+            }
+
+
+            .search-form {
+                max-width: none;
+
+                width: 100%;
+            }
+
+
+            .btn-add {
+                text-align: center;
+
+                width: 100%;
+            }
+
+
+            .actions {
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+
+
+            .actions .btn {
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- =========================================
+         HEADER
+    ========================================== -->
+
+    <div class="header">
+
+        <h1>
+            🦷 Quản lý bác sĩ
+        </h1>
+
+        <p>
+            Quản lý thông tin các bác sĩ
+            của phòng khám nha khoa.
+        </p>
+
+    </div>
+
+
+
+    <!-- =========================================
+         TOOLBAR
+    ========================================== -->
+
+    <div class="toolbar">
+
+
+        <!-- TÌM KIẾM -->
+
+        <form
+            method="GET"
+            action="{{ url_for('doctors') }}"
+            class="search-form"
+        >
+
+            <input
+                type="text"
+                name="search"
+                placeholder="Tìm theo mã, họ tên, chuyên khoa, số điện thoại..."
+                value="{{ search }}"
+            >
+
+            <button
+                type="submit"
+                class="btn btn-search"
+            >
+                🔍 Tìm kiếm
+            </button>
+
+        </form>
+
+
+
+        <!-- THÊM BÁC SĨ -->
+
+        <a
+            href="{{ url_for('add_doctor') }}"
+            class="btn btn-add"
+        >
+            ➕ Thêm bác sĩ
+        </a>
+
+    </div>
+
+
+
+    <!-- =========================================
+         SEARCH RESULT
+    ========================================== -->
+
+    {% if search %}
+
+        <div class="result-info">
+
+            Kết quả tìm kiếm cho:
+
+            <strong>
+                {{ search }}
+            </strong>
+
+        </div>
+
+    {% else %}
+
+        <div class="result-info">
+
+            Danh sách tất cả bác sĩ
+
+        </div>
+
+    {% endif %}
+
+
+
+    <!-- =========================================
+         DOCTORS TABLE
+    ========================================== -->
+
+    <div class="table-container">
+
+
+        {% if doctors %}
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Mã bác sĩ
+                    </th>
+
+                    <th>
+                        Họ và tên
+                    </th>
+
+                    <th>
+                        Chuyên khoa
+                    </th>
+
+                    <th>
+                        Số điện thoại
+                    </th>
+
+                    <th>
+                        Email
+                    </th>
+
+                    <th>
+                        Thao tác
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+
+            <tbody>
+
+
+            {% for doctor in doctors %}
+
+
+                <tr>
+
+
+                    <!-- ID -->
+
+                    <td>
+
+                        {{ doctor[0] }}
+
+                    </td>
+
+
+
+                    <!-- MÃ BÁC SĨ -->
+
+                    <td>
+
+                        <strong>
+                            {{ doctor[1] }}
+                        </strong>
+
+                    </td>
+
+
+
+                    <!-- HỌ TÊN -->
+
+                    <td>
+
+                        {{ doctor[2] }}
+
+                    </td>
+
+
+
+                    <!-- CHUYÊN KHOA -->
+
+                    <td>
+
+                        {{ doctor[3] or "Chưa cập nhật" }}
+
+                    </td>
+
+
+
+                    <!-- ĐIỆN THOẠI -->
+
+                    <td>
+
+                        {{ doctor[4] or "Chưa cập nhật" }}
+
+                    </td>
+
+
+
+                    <!-- EMAIL -->
+
+                    <td>
+
+                        {{ doctor[5] or "Chưa cập nhật" }}
+
+                    </td>
+
+
+
+                    <!-- THAO TÁC -->
+
+                    <td>
+
+                        <div class="actions">
+
+
+                            <!-- =====================
+                                 SỬA
+                            ====================== -->
+
+                            <a
+                                href="{{ url_for('edit_doctor', id=doctor[0]) }}"
+                                class="btn btn-edit"
+                            >
+
+                                ✏️ Sửa
+
+                            </a>
+
+
+
+                            <!-- =====================
+                                 XÓA
+                            ====================== -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('delete_doctor', id=doctor[0]) }}"
+                                onsubmit="return confirm('Bạn có chắc chắn muốn xóa bác sĩ này không?');"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-delete"
+                                >
+
+                                    🗑️ Xóa
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+
+        </table>
+
+
+        {% else %}
+
+
+            <div class="empty">
+
+                <h3>
+                    👨‍⚕️ Chưa có bác sĩ
+                </h3>
+
+
+                {% if search %}
+
+                    <p>
+                        Không tìm thấy bác sĩ phù hợp
+                        với từ khóa
+                        "{{ search }}".
+                    </p>
+
+                {% else %}
+
+                    <p>
+                        Hiện tại chưa có dữ liệu bác sĩ.
+                    </p>
+
+                {% endif %}
+
+
+            </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+
+    <!-- =========================================
+         BACK HOME
+    ========================================== -->
+
+    <div style="margin-top: 20px;">
+
+        <a
+            href="{{ url_for('index') }}"
+            class="btn btn-home"
+        >
+
+            ← Về trang chủ
+
+        </a>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

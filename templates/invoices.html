@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quản lý hóa đơn</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+        }
+
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+        }
+
+        .header h1 {
+            margin: 0;
+            color: #24547d;
+            font-size: 32px;
+        }
+
+        .header p {
+            color: #666;
+            font-size: 17px;
+            margin-bottom: 0;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 25px;
+            border-radius: 18px;
+            margin-bottom: 25px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+        }
+
+        input,
+        select {
+            padding: 13px 16px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .search {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        button,
+        .btn {
+            border: none;
+            padding: 13px 20px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-search {
+            background: #2875e8;
+            color: white;
+        }
+
+        .btn-add {
+            background: #198754;
+            color: white;
+        }
+
+        .btn-edit {
+            background: #ffc107;
+            color: #222;
+        }
+
+        .btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-home {
+            background: #6c757d;
+            color: white;
+        }
+
+        .table-wrapper {
+            background: white;
+            border-radius: 18px;
+            overflow-x: auto;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+
+        th {
+            background: #24547d;
+            color: white;
+            padding: 17px;
+            text-align: left;
+            font-size: 16px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid #eee;
+            font-size: 15px;
+        }
+
+        tr:hover {
+            background: #f8fbff;
+        }
+
+        .price {
+            color: #198754;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .status {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+        }
+
+        .paid {
+            background: #d1e7dd;
+            color: #0f5132;
+        }
+
+        .unpaid {
+            background: #fff3cd;
+            color: #664d03;
+        }
+
+        .cancelled {
+            background: #f8d7da;
+            color: #842029;
+        }
+
+        .actions {
+            display: flex;
+            gap: 7px;
+        }
+
+        .actions form {
+            margin: 0;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 40px;
+            color: #777;
+            font-size: 18px;
+        }
+
+        .footer {
+            margin-top: 25px;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>🧾 Quản lý hóa đơn</h1>
+
+        <p>
+            Quản lý hóa đơn, chi phí dịch vụ và tình trạng thanh toán
+            của phòng khám nha khoa.
+        </p>
+    </div>
+
+
+    <form method="GET" action="{{ url_for('invoices') }}" class="toolbar">
+
+        <input
+            class="search"
+            type="text"
+            name="search"
+            placeholder="Tìm mã hóa đơn, bệnh nhân, dịch vụ..."
+            value="{{ search }}"
+        >
+
+        <select name="payment_status">
+
+            <option value="">
+                -- Tất cả trạng thái --
+            </option>
+
+            <option
+                value="unpaid"
+                {% if payment_status == 'unpaid' %}selected{% endif %}
+            >
+                Chưa thanh toán
+            </option>
+
+            <option
+                value="paid"
+                {% if payment_status == 'paid' %}selected{% endif %}
+            >
+                Đã thanh toán
+            </option>
+
+            <option
+                value="cancelled"
+                {% if payment_status == 'cancelled' %}selected{% endif %}
+            >
+                Đã hủy
+            </option>
+
+        </select>
+
+        <button
+            type="submit"
+            class="btn btn-search"
+        >
+            🔎 Tìm kiếm
+        </button>
+
+        <a
+            href="{{ url_for('add_invoice') }}"
+            class="btn btn-add"
+        >
+            ➕ Thêm hóa đơn
+        </a>
+
+    </form>
+
+
+    <div class="table-wrapper">
+
+        {% if invoices %}
+
+        <table>
+
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Mã hóa đơn</th>
+                    <th>Bệnh nhân</th>
+                    <th>Dịch vụ</th>
+                    <th>SL</th>
+                    <th>Đơn giá</th>
+                    <th>Thành tiền</th>
+                    <th>Thanh toán</th>
+                    <th>Ngày thanh toán</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+            {% for invoice in invoices %}
+
+                <tr>
+
+                    <td>
+                        {{ invoice[0] }}
+                    </td>
+
+                    <td>
+                        <strong>
+                            {{ invoice[1] }}
+                        </strong>
+                    </td>
+
+                    <td>
+                        <strong>
+                            {{ invoice[2] }}
+                        </strong>
+                        <br>
+                        {{ invoice[3] }}
+                    </td>
+
+                    <td>
+                        {{ invoice[4] }}
+                        <br>
+                        {{ invoice[5] }}
+                    </td>
+
+                    <td>
+                        {{ invoice[6] }}
+                    </td>
+
+                    <td class="price">
+                        {{ "{:,.0f}".format(invoice[7]) }} đ
+                    </td>
+
+                    <td class="price">
+                        {{ "{:,.0f}".format(invoice[8]) }} đ
+                    </td>
+
+                    <td>
+
+                        {% if invoice[9] == 'paid' %}
+
+                            <span class="status paid">
+                                Đã thanh toán
+                            </span>
+
+                        {% elif invoice[9] == 'cancelled' %}
+
+                            <span class="status cancelled">
+                                Đã hủy
+                            </span>
+
+                        {% else %}
+
+                            <span class="status unpaid">
+                                Chưa thanh toán
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if invoice[10] %}
+                            {{ invoice[10].strftime('%d/%m/%Y %H:%M') }}
+                        {% else %}
+                            -
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        <div class="actions">
+
+                            <a
+                                href="{{ url_for('edit_invoice', id=invoice[0]) }}"
+                                class="btn btn-edit"
+                            >
+                                ✏️ Sửa
+                            </a>
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('delete_invoice', id=invoice[0]) }}"
+                                onsubmit="return confirm('Bạn có chắc muốn xóa hóa đơn này không?');"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-delete"
+                                >
+                                    🗑️ Xóa
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+            <div class="empty">
+                📭 Chưa có hóa đơn nào.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="footer">
+
+        <a
+            href="{{ url_for('index') }}"
+            class="btn btn-home"
+        >
+            ← Về trang chủ
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+</html>

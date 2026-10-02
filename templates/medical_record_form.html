@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% if mode == "add" %}
+            Thêm hồ sơ khám
+        {% else %}
+            Sửa hồ sơ khám
+        {% endif %}
+    </title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 14px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: #1f4e79;
+            margin-top: 0;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 25px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        select,
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: Arial, sans-serif;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #842029;
+            padding: 14px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button,
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 8px;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .save {
+            background: #198754;
+            color: white;
+        }
+
+        .cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+
+        {% if mode == "add" %}
+
+            <h1>➕ Thêm hồ sơ khám</h1>
+
+            <p class="description">
+                Nhập thông tin kết quả khám bệnh của bệnh nhân.
+            </p>
+
+        {% else %}
+
+            <h1>✏️ Sửa hồ sơ khám</h1>
+
+            <p class="description">
+                Cập nhật thông tin hồ sơ khám bệnh.
+            </p>
+
+        {% endif %}
+
+
+        {% if error %}
+
+            <div class="error">
+                ⚠️ {{ error }}
+            </div>
+
+        {% endif %}
+
+
+        <form method="POST">
+
+
+            <!-- BỆNH NHÂN -->
+
+            <div class="form-group">
+
+                <label>
+
+                    Bệnh nhân
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <select
+                    name="patient_id"
+                    required
+                >
+
+                    <option value="">
+                        -- Chọn bệnh nhân --
+                    </option>
+
+                    {% for patient in patients %}
+
+                        <option
+                            value="{{ patient[0] }}"
+
+                            {% if record and patient[0] == record[1] %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ patient[1] }}
+                            -
+                            {{ patient[2] }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- BÁC SĨ -->
+
+            <div class="form-group">
+
+                <label>
+
+                    Bác sĩ
+
+                    <span class="required">*</span>
+
+                </label>
+
+                <select
+                    name="doctor_id"
+                    required
+                >
+
+                    <option value="">
+                        -- Chọn bác sĩ --
+                    </option>
+
+                    {% for doctor in doctors %}
+
+                        <option
+                            value="{{ doctor[0] }}"
+
+                            {% if record and doctor[0] == record[2] %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ doctor[1] }}
+                            -
+                            {{ doctor[2] }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- LỊCH HẸN -->
+
+            <div class="form-group">
+
+                <label>
+                    Lịch hẹn liên quan
+                </label>
+
+                <select name="appointment_id">
+
+                    <option value="">
+                        -- Không chọn --
+                    </option>
+
+                    {% for appointment in appointments %}
+
+                        <option
+                            value="{{ appointment[0] }}"
+
+                            {% if record and appointment[0] == record[3] %}
+                                selected
+                            {% endif %}
+                        >
+
+                            #{{ appointment[0] }}
+
+                            -
+
+                            {{ appointment[1].strftime('%d/%m/%Y %H:%M') }}
+
+                            -
+
+                            {{ appointment[2] }}
+
+                            -
+
+                            {{ appointment[3] }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- CHẨN ĐOÁN -->
+
+            <div class="form-group">
+
+                <label>
+                    Chẩn đoán
+                </label>
+
+                <textarea
+                    name="diagnosis"
+                    placeholder="Ví dụ: Sâu răng hàm số 6, viêm lợi..."
+                >{% if record %}{{ record[4] or "" }}{% endif %}</textarea>
+
+            </div>
+
+
+            <!-- ĐIỀU TRỊ -->
+
+            <div class="form-group">
+
+                <label>
+                    Phương pháp điều trị
+                </label>
+
+                <textarea
+                    name="treatment"
+                    placeholder="Ví dụ: Trám răng composite, lấy cao răng..."
+                >{% if record %}{{ record[5] or "" }}{% endif %}</textarea>
+
+            </div>
+
+
+            <!-- GHI CHÚ -->
+
+            <div class="form-group">
+
+                <label>
+                    Ghi chú
+                </label>
+
+                <textarea
+                    name="notes"
+                    placeholder="Nhập ghi chú thêm..."
+                >{% if record %}{{ record[6] or "" }}{% endif %}</textarea>
+
+            </div>
+
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="save"
+                >
+
+                    💾
+
+                    {% if mode == "add" %}
+                        Lưu hồ sơ
+                    {% else %}
+                        Cập nhật
+                    {% endif %}
+
+                </button>
+
+
+                <a
+                    href="{{ url_for('medical_records') }}"
+                    class="btn cancel"
+                >
+
+                    ← Hủy
+
+                </a>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    {% if mode == "add" %}
+        <title>Thêm lịch hẹn</title>
+    {% else %}
+        <title>Sửa lịch hẹn</title>
+    {% endif %}
+
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            background: #f4f7fb;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 750px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #1f4e79;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 7px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 11px;
+            border: 1px solid #ccc;
+            border-radius: 7px;
+            font-size: 14px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #1f6feb;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #842029;
+            padding: 12px;
+            border-radius: 7px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button,
+        a {
+            padding: 11px 18px;
+            border-radius: 7px;
+            border: none;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .btn-save {
+            background: #198754;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        {% if mode == "add" %}
+
+            <h1>➕ Thêm lịch hẹn</h1>
+
+        {% else %}
+
+            <h1>✏️ Cập nhật lịch hẹn</h1>
+
+        {% endif %}
+
+
+        {% if error %}
+
+            <div class="error">
+                ⚠️ {{ error }}
+            </div>
+
+        {% endif %}
+
+
+        <form method="POST">
+
+
+            <!-- BỆNH NHÂN -->
+
+            <div class="form-group">
+
+                <label>
+                    Bệnh nhân *
+                </label>
+
+                <select
+                    name="patient_id"
+                    required
+                >
+
+                    <option value="">
+                        -- Chọn bệnh nhân --
+                    </option>
+
+                    {% for patient in patients %}
+
+                        <option
+                            value="{{ patient[0] }}"
+
+                            {% if appointment and patient[0]|string == appointment[5]|string %}
+                                selected
+                            {% endif %}
+
+                        >
+
+                            {{ patient[1] }} -
+                            {{ patient[2] }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- BÁC SĨ -->
+
+            <div class="form-group">
+
+                <label>
+                    Bác sĩ *
+                </label>
+
+                <select
+                    name="doctor_id"
+                    required
+                >
+
+                    <option value="">
+                        -- Chọn bác sĩ --
+                    </option>
+
+                    {% for doctor in doctors %}
+
+                        <option
+                            value="{{ doctor[0] }}"
+
+                            {% if appointment and doctor[0]|string == appointment[6]|string %}
+                                selected
+                            {% endif %}
+
+                        >
+
+                            {{ doctor[1] }} -
+                            {{ doctor[2] }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- NGÀY GIỜ -->
+
+            <div class="form-group">
+
+                <label>
+                    Ngày và giờ khám *
+                </label>
+
+                <input
+                    type="datetime-local"
+                    name="appointment_date"
+                    required
+
+                    {% if appointment %}
+
+                        value="{{ appointment[1].strftime('%Y-%m-%dT%H:%M') if appointment[1] is not string else appointment[1] }}"
+
+                    {% endif %}
+
+                >
+
+            </div>
+
+
+            <!-- TRẠNG THÁI -->
+
+            <div class="form-group">
+
+                <label>
+                    Trạng thái
+                </label>
+
+                <select name="status">
+
+                    <option
+                        value="scheduled"
+                        {% if appointment and appointment[2] == "scheduled" %}selected{% endif %}
+                    >
+                        Đã đặt lịch
+                    </option>
+
+                    <option
+                        value="confirmed"
+                        {% if appointment and appointment[2] == "confirmed" %}selected{% endif %}
+                    >
+                        Đã xác nhận
+                    </option>
+
+                    <option
+                        value="completed"
+                        {% if appointment and appointment[2] == "completed" %}selected{% endif %}
+                    >
+                        Đã khám
+                    </option>
+
+                    <option
+                        value="cancelled"
+                        {% if appointment and appointment[2] == "cancelled" %}selected{% endif %}
+                    >
+                        Đã hủy
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- LÝ DO KHÁM -->
+
+            <div class="form-group">
+
+                <label>
+                    Lý do khám
+                </label>
+
+                <textarea
+                    name="reason"
+                    placeholder="Ví dụ: Đau răng, kiểm tra răng, lấy cao răng..."
+                >{% if appointment %}{{ appointment[3] or "" }}{% endif %}</textarea>
+
+            </div>
+
+
+            <!-- GHI CHÚ -->
+
+            <div class="form-group">
+
+                <label>
+                    Ghi chú
+                </label>
+
+                <textarea
+                    name="notes"
+                    placeholder="Thông tin bổ sung..."
+                >{% if appointment %}{{ appointment[4] or "" }}{% endif %}</textarea>
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="btn-save"
+                >
+                    💾 Lưu lịch hẹn
+                </button>
+
+
+                <a
+                    href="{{ url_for('appointments') }}"
+                    class="btn-cancel"
+                >
+                    Hủy
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

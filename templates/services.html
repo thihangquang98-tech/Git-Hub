@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Quản lý dịch vụ nha khoa</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #333;
+        }
+
+        .container {
+            width: 94%;
+            max-width: 1300px;
+            margin: 30px auto;
+        }
+
+        .header {
+            background: white;
+            border-radius: 14px;
+            padding: 25px 30px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .header h1 {
+            margin: 0 0 8px;
+            color: #1f4e79;
+            font-size: 32px;
+        }
+
+        .header p {
+            margin: 0;
+            color: #666;
+            font-size: 17px;
+        }
+
+        .toolbar {
+            background: white;
+            padding: 20px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .search-form {
+            display: flex;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .search-form input {
+            flex: 1;
+        }
+
+        input {
+            padding: 13px 15px;
+            border: 1px solid #ccc;
+            border-radius: 9px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: #1f6feb;
+        }
+
+        button,
+        .btn {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 9px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 15px;
+            display: inline-block;
+        }
+
+        .search-btn {
+            background: #1f6feb;
+            color: white;
+        }
+
+        .add-btn {
+            background: #198754;
+            color: white;
+        }
+
+        .edit-btn {
+            background: #ffc107;
+            color: #222;
+        }
+
+        .delete-btn {
+            background: #dc3545;
+            color: white;
+        }
+
+        .home-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .table-box {
+            background: white;
+            border-radius: 14px;
+            overflow-x: auto;
+            box-shadow: 0 3px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 900px;
+        }
+
+        th {
+            background: #1f4e79;
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-size: 15px;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f8fbff;
+        }
+
+        .code {
+            font-weight: bold;
+            color: #1f4e79;
+        }
+
+        .service-name {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .price {
+            font-weight: bold;
+            color: #198754;
+            white-space: nowrap;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .actions form {
+            margin: 0;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #777;
+        }
+
+        .empty h2 {
+            color: #1f4e79;
+        }
+
+        .bottom {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 700px) {
+            .toolbar {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .search-form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <!-- HEADER -->
+
+    <div class="header">
+
+        <h1>🦷 Quản lý dịch vụ nha khoa</h1>
+
+        <p>
+            Quản lý các dịch vụ khám, điều trị và bảng giá của phòng khám.
+        </p>
+
+    </div>
+
+
+    <!-- THANH TÌM KIẾM -->
+
+    <div class="toolbar">
+
+        <form
+            method="GET"
+            action="{{ url_for('services') }}"
+            class="search-form"
+        >
+
+            <input
+                type="text"
+                name="search"
+                value="{{ search }}"
+                placeholder="🔍 Tìm mã dịch vụ, tên dịch vụ..."
+            >
+
+            <button
+                type="submit"
+                class="btn search-btn"
+            >
+                🔎 Tìm kiếm
+            </button>
+
+        </form>
+
+
+        <a
+            href="{{ url_for('add_service') }}"
+            class="btn add-btn"
+        >
+            ➕ Thêm dịch vụ
+        </a>
+
+    </div>
+
+
+    <!-- BẢNG DỊCH VỤ -->
+
+    <div class="table-box">
+
+        {% if services %}
+
+        <table>
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Mã dịch vụ</th>
+                    <th>Tên dịch vụ</th>
+                    <th>Mô tả</th>
+                    <th>Giá</th>
+                    <th>Thao tác</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for service in services %}
+
+                <tr>
+
+                    <td>
+                        {{ service[0] }}
+                    </td>
+
+                    <td class="code">
+                        {{ service[1] }}
+                    </td>
+
+                    <td class="service-name">
+                        {{ service[2] }}
+                    </td>
+
+                    <td>
+                        {{ service[3] or "Chưa có mô tả" }}
+                    </td>
+
+                    <td class="price">
+                        {{ "{:,.0f}".format(service[4]) }} đ
+                    </td>
+
+                    <td>
+
+                        <div class="actions">
+
+                            <!-- SỬA -->
+
+                            <a
+                                href="{{ url_for(
+                                    'edit_service',
+                                    id=service[0]
+                                ) }}"
+                                class="btn edit-btn"
+                            >
+                                ✏️ Sửa
+                            </a>
+
+
+                            <!-- XÓA -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for(
+                                    'delete_service',
+                                    id=service[0]
+                                ) }}"
+                                onsubmit="return confirm(
+                                    'Bạn có chắc chắn muốn xóa dịch vụ này không?'
+                                );"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="btn delete-btn"
+                                >
+                                    🗑️ Xóa
+                                </button>
+
+                            </form>
+
+                        </div>
+
+                    </td>
+
+                </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
+
+        {% else %}
+
+        <!-- KHÔNG CÓ DỮ LIỆU -->
+
+        <div class="empty">
+
+            <h2>📋 Chưa có dịch vụ</h2>
+
+            <p>
+                Hiện tại chưa có dịch vụ nào phù hợp với tìm kiếm.
+            </p>
+
+            <a
+                href="{{ url_for('add_service') }}"
+                class="btn add-btn"
+            >
+                ➕ Thêm dịch vụ
+            </a>
+
+        </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <!-- VỀ TRANG CHỦ -->
+
+    <div class="bottom">
+
+        <a
+            href="{{ url_for('index') }}"
+            class="btn home-btn"
+        >
+            ← Về trang chủ
+        </a>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>

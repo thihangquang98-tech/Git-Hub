@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% if invoice %}
+            Sửa hóa đơn
+        {% else %}
+            Thêm hóa đơn
+        {% endif %}
+    </title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            margin: 0;
+            padding: 30px;
+        }
+
+        .container {
+            max-width: 850px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 35px;
+            border-radius: 18px;
+            box-shadow: 0 5px 18px rgba(0,0,0,0.08);
+        }
+
+        h1 {
+            color: #24547d;
+            margin-top: 0;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            box-sizing: border-box;
+            padding: 13px 15px;
+            border: 1px solid #ccc;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .price-box {
+            background: #eef7ff;
+            border-radius: 12px;
+            padding: 18px;
+            margin: 20px 0;
+        }
+
+        .price-box div {
+            margin-bottom: 8px;
+        }
+
+        .price-box div:last-child {
+            margin-bottom: 0;
+        }
+
+        .total {
+            font-size: 24px;
+            font-weight: bold;
+            color: #198754;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 25px;
+        }
+
+        button,
+        .btn {
+            border: none;
+            padding: 13px 22px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-save {
+            background: #198754;
+            color: white;
+        }
+
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        <h1>
+
+            {% if invoice %}
+                ✏️ Sửa hóa đơn
+            {% else %}
+                🧾 Thêm hóa đơn
+            {% endif %}
+
+        </h1>
+
+        <p class="description">
+            Tạo hóa đơn cho dịch vụ nha khoa của bệnh nhân.
+        </p>
+
+
+        <form method="POST">
+
+            <!-- MÃ HÓA ĐƠN -->
+
+            <div class="form-group">
+
+                <label>
+                    Mã hóa đơn *
+                </label>
+
+                <input
+                    type="text"
+                    name="invoice_code"
+                    placeholder="VD: HD001"
+                    required
+                    value="{% if invoice %}{{ invoice[1] }}{% endif %}"
+                >
+
+            </div>
+
+
+            <!-- BỆNH NHÂN -->
+
+            <div class="form-group">
+
+                <label>
+                    Bệnh nhân *
+                </label>
+
+                <select
+                    name="patient_id"
+                    required
+                >
+
+                    <option value="">
+                        -- Chọn bệnh nhân --
+                    </option>
+
+                    {% for patient in patients %}
+
+                        <option
+                            value="{{ patient[0] }}"
+                            {% if invoice and invoice[2] == patient[0] %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ patient[1] }} -
+                            {{ patient[2] }}
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- DỊCH VỤ -->
+
+            <div class="form-group">
+
+                <label>
+                    Dịch vụ *
+                </label>
+
+                <select
+                    name="service_id"
+                    id="service_id"
+                    required
+                    onchange="updatePrice()"
+                >
+
+                    <option value="">
+                        -- Chọn dịch vụ --
+                    </option>
+
+                    {% for service in services %}
+
+                        <option
+                            value="{{ service[0] }}"
+                            data-price="{{ service[3] }}"
+                            {% if invoice and invoice[3] == service[0] %}
+                                selected
+                            {% endif %}
+                        >
+
+                            {{ service[1] }} -
+                            {{ service[2] }}
+                            -
+                            {{ "{:,.0f}".format(service[3]) }} đ
+
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+            </div>
+
+
+            <!-- SỐ LƯỢNG -->
+
+            <div class="form-group">
+
+                <label>
+                    Số lượng *
+                </label>
+
+                <input
+                    type="number"
+                    name="quantity"
+                    id="quantity"
+                    min="1"
+                    required
+                    value="{% if invoice %}{{ invoice[4] }}{% else %}1{% endif %}"
+                    onchange="calculateTotal()"
+                    oninput="calculateTotal()"
+                >
+
+            </div>
+
+
+            <!-- GIÁ -->
+
+            <div class="price-box">
+
+                <div>
+                    Đơn giá:
+                    <strong id="unitPrice">
+                        0 đ
+                    </strong>
+                </div>
+
+                <div class="total">
+                    Thành tiền:
+                    <span id="totalPrice">
+                        0 đ
+                    </span>
+                </div>
+
+            </div>
+
+
+            <!-- TRẠNG THÁI -->
+
+            <div class="form-group">
+
+                <label>
+                    Trạng thái thanh toán
+                </label>
+
+                <select
+                    name="payment_status"
+                >
+
+                    <option
+                        value="unpaid"
+                        {% if not invoice or invoice[7] == 'unpaid' %}
+                            selected
+                        {% endif %}
+                    >
+                        Chưa thanh toán
+                    </option>
+
+                    <option
+                        value="paid"
+                        {% if invoice and invoice[7] == 'paid' %}
+                            selected
+                        {% endif %}
+                    >
+                        Đã thanh toán
+                    </option>
+
+                    <option
+                        value="cancelled"
+                        {% if invoice and invoice[7] == 'cancelled' %}
+                            selected
+                        {% endif %}
+                    >
+                        Đã hủy
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <!-- GHI CHÚ -->
+
+            <div class="form-group">
+
+                <label>
+                    Ghi chú
+                </label>
+
+                <textarea
+                    name="notes"
+                    placeholder="Nhập ghi chú nếu có..."
+                >{% if invoice %}{{ invoice[9] or '' }}{% endif %}</textarea>
+
+            </div>
+
+
+            <!-- BUTTON -->
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="btn btn-save"
+                >
+                    💾 Lưu hóa đơn
+                </button>
+
+                <a
+                    href="{{ url_for('invoices') }}"
+                    class="btn btn-cancel"
+                >
+                    ← Quay lại
+                </a>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<script>
+
+function updatePrice() {
+
+    const serviceSelect =
+        document.getElementById("service_id");
+
+    const selectedOption =
+        serviceSelect.options[
+            serviceSelect.selectedIndex
+        ];
+
+    if (!selectedOption) {
+        return;
+    }
+
+    const price =
+        parseFloat(
+            selectedOption.dataset.price || 0
+        );
+
+    document.getElementById("unitPrice").innerText =
+        price.toLocaleString("vi-VN") + " đ";
+
+    calculateTotal();
+}
+
+
+function calculateTotal() {
+
+    const serviceSelect =
+        document.getElementById("service_id");
+
+    const quantity =
+        parseInt(
+            document.getElementById("quantity").value || 1
+        );
+
+    const selectedOption =
+        serviceSelect.options[
+            serviceSelect.selectedIndex
+        ];
+
+    if (!selectedOption) {
+        document.getElementById("unitPrice").innerText =
+            "0 đ";
+
+        document.getElementById("totalPrice").innerText =
+            "0 đ";
+
+        return;
+    }
+
+    const price =
+        parseFloat(
+            selectedOption.dataset.price || 0
+        );
+
+    const total =
+        price * quantity;
+
+    document.getElementById("unitPrice").innerText =
+        price.toLocaleString("vi-VN") + " đ";
+
+    document.getElementById("totalPrice").innerText =
+        total.toLocaleString("vi-VN") + " đ";
+}
+
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+        updatePrice();
+    }
+);
+
+</script>
+
+</body>
+</html>

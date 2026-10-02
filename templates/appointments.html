@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Quản lý lịch hẹn</title>
+
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+
+        body {
+            font-family: Arial, sans-serif;
+
+            margin: 0;
+
+            background: #f4f7fb;
+
+            color: #333;
+        }
+
+
+        .container {
+            width: 94%;
+
+            max-width: 1400px;
+
+            margin: 30px auto;
+        }
+
+
+        /* =========================
+           HEADER
+        ========================= */
+
+        .header {
+            background: white;
+
+            padding: 25px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0, 0, 0, 0.08);
+        }
+
+
+        .header h1 {
+            margin: 0 0 8px 0;
+
+            color: #1f4e79;
+        }
+
+
+        .header p {
+            margin: 0;
+
+            color: #666;
+        }
+
+
+        /* =========================
+           TOOLBAR
+        ========================= */
+
+        .toolbar {
+            background: white;
+
+            padding: 20px;
+
+            border-radius: 12px;
+
+            margin-bottom: 20px;
+
+            display: flex;
+
+            justify-content: space-between;
+
+            align-items: center;
+
+            gap: 15px;
+
+            flex-wrap: wrap;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0, 0, 0, 0.08);
+        }
+
+
+        .search-form {
+            display: flex;
+
+            gap: 10px;
+
+            flex: 1;
+
+            flex-wrap: wrap;
+        }
+
+
+        .search-input {
+            flex: 1;
+
+            min-width: 280px;
+        }
+
+
+        input,
+        select {
+            padding: 11px 14px;
+
+            border:
+                1px solid #ccc;
+
+            border-radius: 7px;
+
+            font-size: 14px;
+        }
+
+
+        input:focus,
+        select:focus {
+            outline: none;
+
+            border-color: #1f6feb;
+        }
+
+
+        /* =========================
+           BUTTON
+        ========================= */
+
+        button,
+        .btn {
+            border: none;
+
+            border-radius: 7px;
+
+            padding: 10px 16px;
+
+            cursor: pointer;
+
+            text-decoration: none;
+
+            font-size: 14px;
+
+            display: inline-block;
+        }
+
+
+        .btn-search {
+            background: #1f6feb;
+
+            color: white;
+        }
+
+
+        .btn-search:hover {
+            background: #1558bd;
+        }
+
+
+        .btn-add {
+            background: #198754;
+
+            color: white;
+        }
+
+
+        .btn-add:hover {
+            background: #146c43;
+        }
+
+
+        .btn-edit {
+            background: #ffc107;
+
+            color: #212529;
+        }
+
+
+        .btn-edit:hover {
+            background: #e0a800;
+        }
+
+
+        .btn-delete {
+            background: #dc3545;
+
+            color: white;
+        }
+
+
+        .btn-delete:hover {
+            background: #bb2d3b;
+        }
+
+
+        .btn-home {
+            background: #6c757d;
+
+            color: white;
+        }
+
+
+        .btn-home:hover {
+            background: #565e64;
+        }
+
+
+        /* =========================
+           RESULT INFO
+        ========================= */
+
+        .result-info {
+            margin-bottom: 15px;
+
+            color: #666;
+        }
+
+
+        /* =========================
+           TABLE
+        ========================= */
+
+        .table-container {
+            background: white;
+
+            border-radius: 12px;
+
+            overflow-x: auto;
+
+            box-shadow:
+                0 3px 10px
+                rgba(0, 0, 0, 0.08);
+        }
+
+
+        table {
+            width: 100%;
+
+            border-collapse: collapse;
+
+            min-width: 1150px;
+        }
+
+
+        th {
+            background: #1f4e79;
+
+            color: white;
+
+            padding: 14px 10px;
+
+            text-align: left;
+
+            white-space: nowrap;
+        }
+
+
+        td {
+            padding: 13px 10px;
+
+            border-bottom:
+                1px solid #eee;
+
+            vertical-align: middle;
+        }
+
+
+        tr:hover {
+            background: #f8fbff;
+        }
+
+
+        /* =========================
+           STATUS
+        ========================= */
+
+        .status {
+            padding: 6px 10px;
+
+            border-radius: 20px;
+
+            font-size: 12px;
+
+            font-weight: bold;
+
+            display: inline-block;
+
+            white-space: nowrap;
+        }
+
+
+        .scheduled {
+            background: #cfe2ff;
+
+            color: #084298;
+        }
+
+
+        .confirmed {
+            background: #d1e7dd;
+
+            color: #0f5132;
+        }
+
+
+        .completed {
+            background: #e2e3e5;
+
+            color: #41464b;
+        }
+
+
+        .cancelled {
+            background: #f8d7da;
+
+            color: #842029;
+        }
+
+
+        /* =========================
+           ACTION
+        ========================= */
+
+        .actions {
+            display: flex;
+
+            gap: 7px;
+
+            align-items: center;
+        }
+
+
+        .actions form {
+            margin: 0;
+        }
+
+
+        /* =========================
+           EMPTY
+        ========================= */
+
+        .empty {
+            text-align: center;
+
+            padding: 50px;
+
+            color: #777;
+        }
+
+
+        .empty h3 {
+            margin-bottom: 10px;
+        }
+
+
+        /* =========================
+           SMALL TEXT
+        ========================= */
+
+        small {
+            color: #777;
+        }
+
+
+        /* =========================
+           RESPONSIVE
+        ========================= */
+
+        @media (max-width: 800px) {
+
+            .container {
+                width: 96%;
+
+                margin: 15px auto;
+            }
+
+
+            .toolbar {
+                align-items: stretch;
+            }
+
+
+            .search-form {
+                width: 100%;
+            }
+
+
+            .search-input {
+                min-width: 100%;
+            }
+
+
+            .btn-add {
+                text-align: center;
+
+                width: 100%;
+            }
+
+
+            .actions {
+                flex-direction: column;
+
+                align-items: stretch;
+            }
+
+
+            .actions .btn {
+                text-align: center;
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+<div class="container">
+
+
+    <!-- ==========================================
+         HEADER
+    =========================================== -->
+
+    <div class="header">
+
+        <h1>
+            📅 Quản lý lịch hẹn
+        </h1>
+
+        <p>
+            Quản lý lịch khám giữa bệnh nhân và bác sĩ
+            của phòng khám nha khoa.
+        </p>
+
+    </div>
+
+
+
+    <!-- ==========================================
+         TOOLBAR
+    =========================================== -->
+
+    <div class="toolbar">
+
+
+        <!-- SEARCH -->
+
+        <form
+            method="GET"
+            action="{{ url_for('appointments') }}"
+            class="search-form"
+        >
+
+            <input
+                type="text"
+                name="search"
+                class="search-input"
+                placeholder="Tìm bệnh nhân, bác sĩ, mã hoặc lý do khám..."
+                value="{{ search }}"
+            >
+
+
+            <!-- FILTER STATUS -->
+
+            <select name="status">
+
+                <option value="">
+                    -- Tất cả trạng thái --
+                </option>
+
+
+                <option
+                    value="scheduled"
+
+                    {% if status == "scheduled" %}
+                        selected
+                    {% endif %}
+                >
+
+                    Đã đặt lịch
+
+                </option>
+
+
+                <option
+                    value="confirmed"
+
+                    {% if status == "confirmed" %}
+                        selected
+                    {% endif %}
+                >
+
+                    Đã xác nhận
+
+                </option>
+
+
+                <option
+                    value="completed"
+
+                    {% if status == "completed" %}
+                        selected
+                    {% endif %}
+                >
+
+                    Đã khám
+
+                </option>
+
+
+                <option
+                    value="cancelled"
+
+                    {% if status == "cancelled" %}
+                        selected
+                    {% endif %}
+                >
+
+                    Đã hủy
+
+                </option>
+
+            </select>
+
+
+            <!-- SEARCH BUTTON -->
+
+            <button
+                type="submit"
+                class="btn btn-search"
+            >
+
+                🔍 Tìm kiếm
+
+            </button>
+
+        </form>
+
+
+
+        <!-- ADD -->
+
+        <a
+            href="{{ url_for('add_appointment') }}"
+            class="btn btn-add"
+        >
+
+            ➕ Thêm lịch hẹn
+
+        </a>
+
+
+    </div>
+
+
+
+    <!-- ==========================================
+         RESULT INFO
+    =========================================== -->
+
+    <div class="result-info">
+
+        {% if search or status %}
+
+            Kết quả tìm kiếm / lọc lịch hẹn
+
+            {% if search %}
+
+                — từ khóa:
+                <strong>
+                    {{ search }}
+                </strong>
+
+            {% endif %}
+
+        {% else %}
+
+            Danh sách tất cả lịch hẹn
+
+        {% endif %}
+
+    </div>
+
+
+
+    <!-- ==========================================
+         TABLE
+    =========================================== -->
+
+    <div class="table-container">
+
+
+        {% if appointments %}
+
+
+        <table>
+
+
+            <thead>
+
+                <tr>
+
+                    <th>
+                        ID
+                    </th>
+
+                    <th>
+                        Ngày giờ khám
+                    </th>
+
+                    <th>
+                        Bệnh nhân
+                    </th>
+
+                    <th>
+                        Bác sĩ
+                    </th>
+
+                    <th>
+                        Trạng thái
+                    </th>
+
+                    <th>
+                        Lý do khám
+                    </th>
+
+                    <th>
+                        Ghi chú
+                    </th>
+
+                    <th>
+                        Thao tác
+                    </th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+            {% for appointment in appointments %}
+
+
+                <tr>
+
+
+                    <!-- ID -->
+
+                    <td>
+
+                        <strong>
+                            {{ appointment[0] }}
+                        </strong>
+
+                    </td>
+
+
+
+                    <!-- DATE -->
+
+                    <td>
+
+                        <strong>
+
+                            {{ appointment[1].strftime('%d/%m/%Y') }}
+
+                        </strong>
+
+                        <br>
+
+                        <small>
+
+                            {{ appointment[1].strftime('%H:%M') }}
+
+                        </small>
+
+                    </td>
+
+
+
+                    <!-- PATIENT -->
+
+                    <td>
+
+                        <strong>
+                            {{ appointment[5] }}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            {{ appointment[4] }}
+                        </small>
+
+                    </td>
+
+
+
+                    <!-- DOCTOR -->
+
+                    <td>
+
+                        <strong>
+                            {{ appointment[7] }}
+                        </strong>
+
+                        <br>
+
+                        <small>
+                            {{ appointment[8] }}
+                        </small>
+
+                    </td>
+
+
+
+                    <!-- STATUS -->
+
+                    <td>
+
+
+                        {% if appointment[2] == "scheduled" %}
+
+                            <span class="status scheduled">
+
+                                📅 Đã đặt lịch
+
+                            </span>
+
+
+                        {% elif appointment[2] == "confirmed" %}
+
+                            <span class="status confirmed">
+
+                                ✅ Đã xác nhận
+
+                            </span>
+
+
+                        {% elif appointment[2] == "completed" %}
+
+                            <span class="status completed">
+
+                                ✔️ Đã khám
+
+                            </span>
+
+
+                        {% elif appointment[2] == "cancelled" %}
+
+                            <span class="status cancelled">
+
+                                ❌ Đã hủy
+
+                            </span>
+
+
+                        {% else %}
+
+                            <span class="status">
+
+                                {{ appointment[2] }}
+
+                            </span>
+
+                        {% endif %}
+
+
+                    </td>
+
+
+
+                    <!-- REASON -->
+
+                    <td>
+
+                        {% if appointment[3] %}
+
+                            {{ appointment[3] }}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </td>
+
+
+
+                    <!-- NOTES -->
+
+                    <td>
+
+                        {% if appointment[4] %}
+
+                            {{ appointment[4] }}
+
+                        {% else %}
+
+                            —
+
+                        {% endif %}
+
+                    </td>
+
+
+
+                    <!-- ACTION -->
+
+                    <td>
+
+                        <div class="actions">
+
+
+                            <!-- EDIT -->
+
+                            <a
+                                href="{{ url_for('edit_appointment', id=appointment[0]) }}"
+                                class="btn btn-edit"
+                            >
+
+                                ✏️ Sửa
+
+                            </a>
+
+
+
+                            <!-- DELETE -->
+
+                            <form
+                                method="POST"
+                                action="{{ url_for('delete_appointment', id=appointment[0]) }}"
+                                onsubmit="return confirm('Bạn có chắc chắn muốn xóa lịch hẹn này không?');"
+                            >
+
+                                <button
+                                    type="submit"
+                                    class="btn btn-delete"
+                                >
+
+                                    🗑️ Xóa
+
+                                </button>
+
+                            </form>
+
+
+                        </div>
+
+                    </td>
+
+
+                </tr>
+
+
+            {% endfor %}
+
+
+            </tbody>
+
+        </table>
+
+
+        {% else %}
+
+
+        <!-- EMPTY -->
+
+        <div class="empty">
+
+            <h3>
+                📅 Chưa có lịch hẹn
+            </h3>
+
+            <p>
+                Không tìm thấy lịch hẹn phù hợp.
+            </p>
+
+            <br>
+
+            <a
+                href="{{ url_for('add_appointment') }}"
+                class="btn btn-add"
+            >
+
+                ➕ Tạo lịch hẹn đầu tiên
+
+            </a>
+
+        </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+
+    <!-- ==========================================
+         HOME
+    =========================================== -->
+
+    <div style="margin-top: 20px;">
+
+        <a
+            href="{{ url_for('index') }}"
+            class="btn btn-home"
+        >
+
+            ← Về trang chủ
+
+        </a>
+
+    </div>
+
+
+</div>
+
+
+</body>
+
+</html>

@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% if mode == "add" %}
+            Thêm dịch vụ
+        {% else %}
+            Sửa dịch vụ
+        {% endif %}
+    </title>
+
+    <style>
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #333;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 750px;
+            margin: 40px auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #1f4e79;
+            font-size: 30px;
+        }
+
+        .description {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .required {
+            color: #dc3545;
+        }
+
+        input,
+        textarea {
+            width: 100%;
+            padding: 13px 15px;
+            border: 1px solid #ccc;
+            border-radius: 9px;
+            font-size: 15px;
+            font-family: Arial, sans-serif;
+            outline: none;
+        }
+
+        input:focus,
+        textarea:focus {
+            border-color: #1f6feb;
+        }
+
+        textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .error {
+            background: #f8d7da;
+            color: #842029;
+            padding: 14px;
+            border-radius: 9px;
+            margin-bottom: 20px;
+        }
+
+        .buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        button,
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 9px;
+            text-decoration: none;
+            cursor: pointer;
+            font-size: 15px;
+        }
+
+        .save {
+            background: #198754;
+            color: white;
+        }
+
+        .cancel {
+            background: #6c757d;
+            color: white;
+        }
+
+    </style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="card">
+
+        {% if mode == "add" %}
+
+            <h1>➕ Thêm dịch vụ nha khoa</h1>
+
+            <p class="description">
+                Nhập thông tin dịch vụ mới của phòng khám.
+            </p>
+
+        {% else %}
+
+            <h1>✏️ Chỉnh sửa dịch vụ</h1>
+
+            <p class="description">
+                Cập nhật thông tin và giá dịch vụ.
+            </p>
+
+        {% endif %}
+
+
+        {% if error %}
+
+            <div class="error">
+                ⚠️ {{ error }}
+            </div>
+
+        {% endif %}
+
+
+        <form method="POST">
+
+
+            <!-- MÃ DỊCH VỤ -->
+
+            <div class="form-group">
+
+                <label>
+                    Mã dịch vụ
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    name="service_code"
+                    value="{% if service %}{{ service[1] }}{% endif %}"
+                    placeholder="Ví dụ: DV007"
+                    required
+                >
+
+            </div>
+
+
+            <!-- TÊN DỊCH VỤ -->
+
+            <div class="form-group">
+
+                <label>
+                    Tên dịch vụ
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="text"
+                    name="service_name"
+                    value="{% if service %}{{ service[2] }}{% endif %}"
+                    placeholder="Ví dụ: Nhổ răng khôn"
+                    required
+                >
+
+            </div>
+
+
+            <!-- MÔ TẢ -->
+
+            <div class="form-group">
+
+                <label>
+                    Mô tả dịch vụ
+                </label>
+
+                <textarea
+                    name="description"
+                    placeholder="Nhập mô tả chi tiết về dịch vụ..."
+                >{% if service %}{{ service[3] or "" }}{% endif %}</textarea>
+
+            </div>
+
+
+            <!-- GIÁ -->
+
+            <div class="form-group">
+
+                <label>
+                    Giá dịch vụ (VNĐ)
+                    <span class="required">*</span>
+                </label>
+
+                <input
+                    type="number"
+                    name="price"
+                    min="0"
+                    step="1000"
+                    value="{% if service %}{{ service[4] }}{% else %}0{% endif %}"
+                    placeholder="Ví dụ: 500000"
+                    required
+                >
+
+            </div>
+
+
+            <!-- NÚT -->
+
+            <div class="buttons">
+
+                <button
+                    type="submit"
+                    class="save"
+                >
+
+                    💾
+
+                    {% if mode == "add" %}
+                        Lưu dịch vụ
+                    {% else %}
+                        Cập nhật dịch vụ
+                    {% endif %}
+
+                </button>
+
+
+                <a
+                    href="{{ url_for('services') }}"
+                    class="btn cancel"
+                >
+                    ← Hủy
+                </a>
+
+            </div>
+
+
+        </form>
+
+    </div>
+
+</div>
+
+</body>
+
+</html>
