@@ -1,8 +1,5 @@
 services:
 
-  # =========================================================
-  # FLASK WEB APPLICATION
-  # =========================================================
   web:
     build: .
     container_name: dental-web
@@ -30,9 +27,6 @@ services:
       - clinic_network
 
 
-  # =========================================================
-  # POSTGRESQL DATABASE
-  # =========================================================
   db:
     image: postgres:16
     container_name: dental-postgres
@@ -42,9 +36,6 @@ services:
       POSTGRES_DB: dental_clinic
       POSTGRES_USER: clinic_user
       POSTGRES_PASSWORD: clinic_password
-
-    ports:
-      - "5433:5432"
 
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -67,9 +58,6 @@ services:
       - clinic_network
 
 
-  # =========================================================
-  # PGADMIN
-  # =========================================================
   pgadmin:
     image: dpage/pgadmin4:latest
     container_name: dental-pgadmin
@@ -93,10 +81,6 @@ services:
       - clinic_network
 
 
-  # =========================================================
-  # POSTGRESQL EXPORTER
-  # Dùng riêng cho Dental Clinic
-  # =========================================================
   dental-postgres-exporter:
     image: prometheuscommunity/postgres-exporter:v0.15.0
     container_name: dental-postgres-exporter
@@ -116,18 +100,10 @@ services:
       - clinic_network
 
 
-# =========================================================
-# VOLUMES
-# =========================================================
 volumes:
-
   postgres_data:
 
 
-# =========================================================
-# NETWORK
-# =========================================================
 networks:
-
   clinic_network:
     driver: bridge
